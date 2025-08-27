@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生物工程设备练习系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .nav-btn.active {
+            background: #4CAF50;
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .nav-btn:not(.active) {
+            background: rgba(255,255,255,0.9);
+            color: #333;
+        }
+        
+        .nav-btn:hover:not(.active) {
+            background: rgba(255,255,255,1);
+            transform: scale(1.02);
+        }
+        
+        .section {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .exam-config {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .config-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .config-row label {
+            font-weight: bold;
+            min-width: 120px;
+        }
+        
+        .config-row input, .config-row select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .question-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .question-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .question-type {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .question-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .options {
+            margin-bottom: 20px;
+        }
+        
+        .option {
+            display: block;
+            margin: 10px 0;
+            padding: 10px 15px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .option:hover {
+            border-color: #007bff;
+            background: #f0f8ff;
+        }
+        
+        .option.selected {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        
+        .option.correct {
+            border-color: #4CAF50;
+            background: #e8f5e8;
+        }
+        
+        .option.wrong {
+            border-color: #f44336;
+            background: #ffebee;
+        }
+        
+        .fill-blank input {
+            border: none;
+            border-bottom: 2px solid #007bff;
+            padding: 5px 10px;
+            font-size: 16px;
+            background: transparent;
+            margin: 0 5px;
+            min-width: 100px;
+        }
+        
+        .fill-blank input.correct {
+            border-color: #4CAF50;
+            background: #e8f5e8;
+        }
+        
+        .fill-blank input.wrong {
+            border-color: #f44336;
+            background: #ffebee;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+        
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #45a049;
+            transform: translateY(-1px);
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+            transform: translateY(-1px);
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        
+        .result.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .result.wrong {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .result.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .add-question-form {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        .option-inputs {
+            display: none;
+        }
+        
+        .option-inputs.show {
+            display: block;
+        }
+        
+        .option-input {
+            margin-bottom: 10px;
+        }
+        
+        .exam-progress {
+            background: #e9ecef;
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .exam-progress-bar {
+            height: 100%;
+            background: #007bff;
+            transition: width 0.3s;
+        }
+        
+        .similarity-score {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+
+        @media (max-width: 768px) {
+            .nav-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .config-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .config-row label {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>化工原理——传热蒸发</h1>
+            <p>基于课程重点内容开发——By Wu, J. H.</p>
+        </div>
+        
+        <div class="nav-buttons">
+            <!-- <button class="nav-btn active" onclick="showSection('exam')">开始考试</button>--!>
+            <button class="nav-btn" onclick="showSection('practice')">自由练习</button>
+            <button class="nav-btn" onclick="showSection('manage')">题库管理</button>
+            <!-- <button class="nav-btn" onclick="showSection('wrongbook')">错题本</button>
+            <button class="nav-btn" onclick="showSection('bookmarks')">我的书签</button> --!>
+            <button class="nav-btn" onclick="showSection('stats')">学习统计</button>
+        </div>
+        
+        <!-- 考试模块 -->
+        <div id="exam" class="section">
+            <h2>考试模式</h2>
+            <div class="exam-config" id="examConfig">
+                <div class="config-row">
+                    <label>题目数量：</label>
+                    <input type="number" id="examQuestionCount" value="10" min="1" max="50">
+                    <span>题（最多50题）</span>
+                </div>
+                <div class="config-row">
+                    <label>题型选择：</label>
+                    <select id="examQuestionType">
+                        <option value="all">全部题型</option>
+                        <option value="fill">仅填空题</option>
+                        <option value="choice">仅选择题</option>
+                        <option value="essay">仅简答题</option>
+                    </select>
+                </div>
+                <div class="buttons">
+                    <button class="btn btn-success" onclick="startExam()">开始考试</button>
+                </div>
+            </div>
+            
+            <div id="examContent" style="display: none;">
+                <div class="exam-progress">
+                    <div class="exam-progress-bar" id="examProgressBar"></div>
+                </div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="examCurrent">1</div>
+                        <div>当前题目</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="examTotal">10</div>
+                        <div>总题数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="examCorrect">0</div>
+                        <div>已答对</div>
+                    </div>
+                </div>
+                
+                <div id="examQuestionContainer">
+                    <!-- 考试题目将在这里动态生成 -->
+                </div>
+                
+                <div class="buttons" style="margin-top: 20px;">
+					<button class="btn btn-primary" onclick="nextExamQuestion()">下一题</button>
+                    <button class="btn btn-secondary" onclick="endExam()">结束考试</button>
+                </div>
+            </div>
+            
+            <div id="examResult" style="display: none;">
+                <h2>考试结果</h2>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="finalCorrect">0</div>
+                        <div>答对题数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="finalTotal">0</div>
+                        <div>总题数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="finalAccuracy">0%</div>
+                        <div>正确率</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="finalTime">0</div>
+                        <div>用时(分钟)</div>
+                    </div>
+                </div>
+                
+                <div id="examGrade" style="text-align: center; margin: 20px 0;">
+                    <div style="font-size: 2.5em; font-weight: bold; color: #007bff;" id="gradeDisplay">0分</div>
+                    <div style="font-size: 1.2em; margin-top: 10px;" id="gradeComment">继续努力！</div>
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn btn-primary" onclick="resetExam()">重新考试</button>
+                    <button class="btn btn-secondary" onclick="showWrongQuestions()" id="wrongQuestionsBtn" style="display: none;">查看错题 (0)</button>
+                </div>
+                
+                <div id="wrongQuestionsSection" style="display: none; margin-top: 20px;">
+                    <h3>本次考试错题回顾</h3>
+                    <div id="currentExamWrongQuestions"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 自由练习模块 -->
+        <div id="practice" class="section active">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalQuestions">0</div>
+                    <div>总题数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="correctCount">0</div>
+                    <div>答对</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="wrongCount">0</div>
+                    <div>答错</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="accuracy">0%</div>
+                    <div>正确率</div>
+                </div>
+            </div>
+            
+            <div id="questionContainer">
+                <!-- 题目将在这里动态生成 -->
+            </div>
+        </div>
+        
+        <!-- 错题本模块 -->
+        <div id="wrongbook" class="section">
+            <h2>错题本</h2>
+            <div style="margin-bottom: 20px;">
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="wrongQuestionsCount">0</div>
+                        <div>错题总数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="wrongQuestionsRate">0%</div>
+                        <div>错误率</div>
+                    </div>
+                </div>
+                <div class="buttons" style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="practiceWrongQuestions()">专项练习</button>
+                    <button class="btn btn-secondary" onclick="clearWrongQuestions()">清空错题本</button>
+                </div>
+            </div>
+            <div id="wrongQuestionsContainer">
+                <!-- 错题将在这里显示 -->
+            </div>
+        </div>
+        
+        <!-- 我的书签模块 -->
+        <div id="bookmarks" class="section">
+            <h2>我的书签</h2>
+            <div style="margin-bottom: 20px;">
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="bookmarksCount">0</div>
+                        <div>收藏题数</div>
+                    </div>
+                </div>
+                <div class="buttons" style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="practiceBookmarkedQuestions()">专项练习</button>
+                    <button class="btn btn-secondary" onclick="clearBookmarks()">清空书签</button>
+                </div>
+            </div>
+            <div id="bookmarksContainer">
+                <!-- 收藏的题目将在这里显示 -->
+            </div>
+        </div>
+        
+        <!-- 题库管理模块 -->
+        <div id="manage" class="section">
+            <h2>添加新题目</h2>
+            <div class="add-question-form">
+                <div class="form-group">
+                    <label>题目类型：</label>
+                    <select id="questionType" onchange="toggleOptions()">
+                        <option value="fill">填空题</option>
+                        <option value="choice">选择题</option>
+                        <option value="essay">简答题</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>题目内容：</label>
+                    <textarea id="questionText" placeholder="输入题目内容，填空题请用 _____ 表示空白处"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>正确答案：</label>
+                    <textarea id="correctAnswer" placeholder="填空题多个答案请用英文分号;分隔，简答题可以输入参考答案"></textarea>
+                </div>
+                
+                <div id="optionInputs" class="option-inputs">
+                    <div class="form-group">
+                        <label>选项A：</label>
+                        <input type="text" id="optionA" placeholder="输入选项A">
+                    </div>
+                    <div class="form-group">
+                        <label>选项B：</label>
+                        <input type="text" id="optionB" placeholder="输入选项B">
+                    </div>
+                    <div class="form-group">
+                        <label>选项C：</label>
+                        <input type="text" id="optionC" placeholder="输入选项C">
+                    </div>
+                    <div class="form-group">
+                        <label>选项D：</label>
+                        <input type="text" id="optionD" placeholder="输入选项D">
+                    </div>
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn btn-success" onclick="addQuestion()">添加题目</button>
+                    <button class="btn btn-secondary" onclick="clearForm()">清空表单</button>
+                </div>
+            </div>
+            
+            <h2>题库预览</h2>
+            <div id="questionBank">
+                <!-- 题库内容将在这里显示 -->
+            </div>
+        </div>
+        
+        <!-- 统计模块 -->
+        <div id="stats" class="section">
+            <h2>学习统计</h2>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalExams">0</div>
+                    <div>考试次数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="avgAccuracy">0%</div>
+                    <div>平均正确率</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="bestStreak">0</div>
+                    <div>最长连对</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="studyTime">0</div>
+                    <div>学习时长(分)</div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="clearStats()" style="background: #dc3545; border-color: #dc3545;">
+                    清零所有学习统计
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 内置题库 - 基于所有slide内容
+  let builtInQuestionBank = [
+  {
+    type: 'fill',
+    question: '热传递的三种基本方式是_____、_____和_____。',
+    answer: '热传导;热对流;热辐射',
+    category: '传热基本方式'
+  },
+  
+  {
+    type: 'fill',
+    question: '热传导是指物体各部分之间不发生_____，仅借_____等微观粒子的热运动而引起的热量传递。',
+    answer: '相对位移;分子、原子和自由电子',
+    category: '热传导'
+  },
+  
+  {
+    type: 'fill',
+    question: '热对流是指_____各部分之间发生相对位移、_____质点相互掺混所引起的热量传递。',
+    answer: '流体;冷热流体',
+    category: '热对流'
+  },
+  
+  {
+    type: 'fill',
+    question: '任何物体只要其绝对温度不为_____，都会以_____的形式向外界辐射能量。',
+    answer: '零度(0K);电磁波',
+    category: '热辐射'
+  },
+  
+  {
+    type: 'fill',
+    question: '对流传热分为_____对流传热和_____对流传热两种。',
+    answer: '自然;强制',
+    category: '对流传热分类'
+  },
+  
+  {
+    type: 'fill',
+    question: '自然对流传热是由于内部存在_____，因受热而使各部分流体_____的局部变化而发生的对流传热。',
+    answer: '温度差;密度',
+    category: '自然对流传热'
+  },
+  
+  {
+    type: 'fill',
+    question: '强制对流传热是用_____使流体发生对流而传热的。',
+    answer: '机械能(例如搅拌流体或用泵将流体送经导管)',
+    category: '强制对流传热'
+  },
+  
+  {
+    type: 'fill',
+    question: '_____表示灰体发射能力占黑体辐射能力的分数，_____为外界投射来的辐射能可被物体吸收的分数。',
+    answer: '黑度;吸收率',
+    category: '黑度与吸收率'
+  },
+  
+  {
+    type: 'fill',
+    question: '圆筒壁热传导与平壁热传导的区别是圆筒壁的传热面积不是_____，是随_____而变的。',
+    answer: '常量;半径',
+    category: '圆筒壁与平壁传热区别'
+  },
+  
+  {
+    type: 'fill',
+    question: '提高总传热系数K值的关键是减小起_____作用的热阻，通常由热阻_____的那一侧的对流传热所控制。',
+    answer: '主要;大',
+    category: '提高总传热系数'
+  },
+  
+  {
+    type: 'fill',
+    question: '传热温差损失就等于溶液的_____与同压力下_____的沸点之差。',
+    answer: '沸点;水',
+    category: '温度差损失'
+  },
+  
+  {
+    type: 'fill',
+    question: '单效蒸发中，产生的二次蒸汽_____；多效蒸发中，_____利用二次蒸汽进行蒸发。',
+    answer: '直接送到冷凝器冷凝成水而排出;多次',
+    category: '单效与多效蒸发'
+  },
+  
+  {
+    type: 'fill',
+    question: '_____是蒸发需要不断供给热能所用的水蒸汽，_____是蒸发时产生的水蒸汽。',
+    answer: '加热蒸汽;二次蒸汽',
+    category: '加热蒸汽与二次蒸汽'
+  },
+  
+  {
+    type: 'fill',
+    question: '溶液的沸点升高与溶液的_____、溶液中溶质的_____以及_____有关。',
+    answer: '种类;浓度;蒸发压力',
+    category: '溶液沸点升高'
+  },
+  
+  // ============ 单选题 ============
+  {
+    type: 'choice',
+    question: '下列哪种传热方式不需要物质作为介质？',
+    options: [
+      'A. 热传导',
+      'B. 热对流', 
+      'C. 热辐射',
+      'D. 以上都需要'
+    ],
+    answer: 'C',
+    category: '传热基本方式'
+  },
+  
+  {
+    type: 'choice',
+    question: '强制对流传热是通过什么实现的？',
+    options: [
+      'A. 温度差引起的密度变化',
+      'B. 机械能驱动流体运动',
+      'C. 电磁波传递',
+      'D. 分子运动'
+    ],
+    answer: 'B',
+    category: '强制对流传热'
+  },
+  
+  {
+    type: 'choice',
+    question: '黑度在数值上与吸收率相等的条件是：',
+    options: [
+      'A. 物体为黑体',
+      'B. 温度相同且黑度或吸收率随温度的变化可忽略',
+      'C. 物体表面光滑',
+      'D. 环境温度为零'
+    ],
+    answer: 'B',
+    category: '黑度与吸收率'
+  },
+  
+  {
+    type: 'choice',
+    question: '圆筒壁稳态热传导的假设条件不包括：',
+    options: [
+      'A. 各点温度不随时间而变',
+      'B. 各点温度只沿径向变换',
+      'C. 传热面积为常量',
+      'D. 一维温度场'
+    ],
+    answer: 'C',
+    category: '圆筒壁传热假设'
+  },
+  
+  {
+    type: 'choice',
+    question: '要有效提高总传热系数K值，应该：',
+    options: [
+      'A. 同时提高两侧的对流传热系数',
+      'B. 减小起主要作用的热阻',
+      'C. 增加传热面积',
+      'D. 提高温差'
+    ],
+    answer: 'B',
+    category: '提高总传热系数'
+  },
+  
+  {
+    type: 'choice',
+    question: '蒸发过程中温度差损失的主要原因是：',
+    options: [
+      'A. 加热蒸汽温度过低',
+      'B. 溶液的沸点高于同压力下水的沸点',
+      'C. 传热面积不足',
+      'D. 流体流速过快'
+    ],
+    answer: 'B',
+    category: '温度差损失'
+  },
+  
+  {
+    type: 'choice',
+    question: '多效蒸发相比单效蒸发的主要优点是：',
+    options: [
+      'A. 操作简单',
+      'B. 设备投资少',
+      'C. 节约能源',
+      'D. 传热效果好'
+    ],
+    answer: 'C',
+    category: '多效蒸发优点'
+  },
+  
+  {
+    type: 'choice',
+    question: '杜林规则描述的是：',
+    options: [
+      'A. 溶液浓度与沸点的关系',
+      'B. 某液体在两种不同压力下两沸点之差与标准体在相应压力下两沸点之差的比值为常数',
+      'C. 传热系数与温差的关系',
+      'D. 蒸发速率与压力的关系'
+    ],
+    answer: 'B',
+    category: '杜林规则'
+  },
+  
+  {
+    type: 'choice',
+    question: '蒸发单元操作的特点不包括：',
+    options: [
+      'A. 沸点升高',
+      'B. 需要消耗大量加热蒸汽',
+      'C. 操作温度低',
+      'D. 需要考虑物料的工艺特性'
+    ],
+    answer: 'C',
+    category: '蒸发操作特点'
+  },
+  
+  // ============ 判断题 ============
+  {
+    type: 'judge',
+    question: '热传导需要物质作为介质才能进行。',
+    answer: true,
+    category: '热传导'
+  },
+  
+  {
+    type: 'judge',
+    question: '热辐射可以在真空中进行。',
+    answer: true,
+    category: '热辐射'
+  },
+  
+  {
+    type: 'judge',
+    question: '自然对流是由机械力驱动的。',
+    answer: false,
+    category: '自然对流传热'
+  },
+  
+  {
+    type: 'judge',
+    question: '黑度总是等于吸收率。',
+    answer: false,
+    category: '黑度与吸收率'
+  },
+  
+  {
+    type: 'judge',
+    question: '圆筒壁的传热面积随半径变化。',
+    answer: true,
+    category: '圆筒壁传热'
+  },
+  
+  {
+    type: 'judge',
+    question: '总传热系数主要由热阻小的一侧控制。',
+    answer: false,
+    category: '总传热系数'
+  },
+  
+  {
+    type: 'judge',
+    question: '溶液的沸点总是高于纯溶剂的沸点。',
+    answer: true,
+    category: '溶液沸点升高'
+  },
+  
+  {
+    type: 'judge',
+    question: '多效蒸发比单效蒸发更节能。',
+    answer: true,
+    category: '多效蒸发'
+  },
+  
+  // ============ 简答题 ============
+  {
+    type: 'essay',
+    question: '简述热传递的三种基本方式及其特点。',
+    answer: '1）热传导：物体各部分之间不发生相对位移，仅借分子、原子和自由电子等微观粒子的热运动而引起的热量传递。特点：需要物质作介质，微观粒子运动传热。2）热对流：流体各部分之间发生相对位移、冷热流体质点相互掺混所引起的热量传递。特点：只发生在流体中，有宏观流动。3）热辐射：物体以电磁波的形式向外界辐射能量进行的热量传递。特点：不需要介质，可在真空中进行。',
+    category: '传热基本方式'
+  },
+  
+  {
+    type: 'essay',
+    question: '比较自然对流传热和强制对流传热的区别。',
+    answer: '自然对流传热：流体原来是静止的，由于内部存在温度差，因受热而使各部分流体密度的局部变化，导致发生对流而传热。驱动力是浮力，传热系数相对较小。强制对流传热：用机械能（如搅拌流体或用泵将流体送经导管）使流体发生对流而传热。驱动力是外加机械力，传热系数相对较大，传热效果好。',
+    category: '对流传热分类'
+  },
+  
+  {
+    type: 'essay',
+    question: '如何有效提高总传热系数K值？',
+    answer: '要提高总传热系数K值，应设法减小热阻，特点减小起主要作用的热阻。具体措施：1）总热阻由热阻大的一侧的对流传热控制，关键在于提高对流传热系数较小一侧的α；2）若两侧α相差不大时，必须同时提高两侧的α；3）当管壁热阻和污垢热阻可忽略时，重点提高较小的α；4）若污垢热阻为控制因素，必须减慢污垢形成速率或及时清除污垢。',
+    category: '提高总传热系数'
+  },
+  
+  {
+    type: 'essay',
+    question: '说明蒸发过程中温度差损失的概念及其产生原因。',
+    answer: '温度差损失是指蒸发器里的传热温差因溶液沸点升高而减小的现象，等于溶液的沸点与同压力下水的沸点之差。产生原因：1）溶液沸点升高：溶液中含有溶质，沸点高于纯溶剂；2）液柱静压头的影响：增加了溶液底部的压力；3）流体流过加热管时的阻力损失：进一步提高了溶液沸点。这些因素都导致有效传热温差减小，影响传热效果。',
+    category: '温度差损失'
+  },
+  
+  {
+    type: 'essay',
+    question: '比较单效蒸发和多效蒸发的特点。',
+    answer: '单效蒸发：所产生的二次蒸汽不用来使物料进一步蒸发，直接送到冷凝器冷凝成水而排出。特点：操作简单，设备投资少，但能耗大，蒸汽利用率低。多效蒸发：多次利用二次蒸汽进行蒸发。特点：节约能源，蒸汽利用率高，但设备投资大，操作复杂，需要合理的压力分配。多效蒸发通过梯级利用蒸汽，大大提高了热能利用效率。',
+    category: '单效与多效蒸发'
+  },
+  
+  {
+    type: 'essay',
+    question: '解释杜林规则及其应用意义。',
+    answer: '杜林规则：某液体（或溶液）在两种不同压力下两沸点之差，与另一标准体在相应压力下两沸点之差，其比值为一常数。数学表达：(t₁-t₂)/(T₁-T₂)=常数，其中t为待测液体沸点，T为标准体（通常为水）沸点。应用意义：1）可以预测溶液在不同压力下的沸点；2）简化了溶液沸点升高的计算；3）为蒸发器设计提供了重要的热力学数据；4）有助于优化蒸发工艺条件。',
+    category: '杜林规则'
+  },
+  
+  // ============ 快速记忆口诀 ============
+  {
+    type: 'memory',
+    question: '传热三方式口诀',
+    answer: '导对辐，三传热；分子动，不位移（导）；流体混，有位移（对）；电磁波，真空行（辐）',
+    category: '记忆口诀'
+  },
+  
+  {
+    type: 'memory', 
+    question: '对流分类口诀',
+    answer: '自然靠浮力，密度差驱动；强制用机械，泵搅来推动',
+    category: '记忆口诀'
+  },
+  
+  {
+    type: 'memory',
+    question: '提高K值口诀', 
+    answer: '减阻提K值，主要阻抗减；两侧差不大，同时都要提；污垢是关键，清除要及时',
+    category: '记忆口诀'
+  },
+  
+  {
+    type: 'memory',
+    question: '温差损失口诀',
+    answer: '溶液沸点高，温差有损失；溶质浓度大，静压阻力加',
+    category: '记忆口诀'
+  },
+  
+  {
+    type: 'memory',
+    question: '蒸发特点口诀',
+    answer: '沸点升高要注意，节能环保是主题；物料特性需考虑，工艺选择要合理',
+    category: '记忆口诀'
+  }
+];
+
+
+        
+        // 用户自定义题库
+        let customQuestionBank = [];
+        
+        // 错题和书签
+        let wrongQuestions = [];
+        let bookmarkedQuestions = [];
+        
+        // 获取完整题库
+        function getFullQuestionBank() {
+            return [...builtInQuestionBank, ...customQuestionBank];
+        }
+
+        // 统计数据
+        let stats = {
+            totalExams: 0,
+            totalCorrectAnswers: 0,
+            totalQuestions: 0,
+            currentStreak: 0,
+            bestStreak: 0,
+            studyStartTime: Date.now(),
+            practiceStats: {
+                totalAnswered: 0,
+                correctAnswers: 0
+            }
+        };
+
+        // 考试相关变量
+        let currentExam = {
+            questions: [],
+            currentIndex: 0,
+            correctCount: 0,
+            startTime: null,
+            isActive: false,
+            answers: [], // 记录每道题的答题情况
+            wrongQuestionIndexes: [] // 记录答错题目的索引
+        };
+
+        // 自由练习相关变量
+        let currentQuestion = null;
+        let practiceAnswered = false;
+
+        // 初始化
+		function init() {
+			loadStoredData();
+			updateStats();
+			updateQuestionBank();
+			updateWrongQuestionsDisplay();
+			updateBookmarksDisplay();
+			loadPracticeQuestion();
+		}
+
+        // 显示指定页面
+        function showSection(sectionName) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(sectionName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // 开始考试
+        function startExam() {
+            const questionCount = parseInt(document.getElementById('examQuestionCount').value);
+            const questionType = document.getElementById('examQuestionType').value;
+            const fullBank = getFullQuestionBank();
+            
+            if (fullBank.length === 0) {
+                alert('题库为空，请先添加题目');
+                return;
+            }
+            
+            // 过滤题目类型
+            let availableQuestions = fullBank;
+            if (questionType !== 'all') {
+                availableQuestions = fullBank.filter(q => q.type === questionType);
+            }
+            
+            if (availableQuestions.length === 0) {
+                alert('没有找到该类型的题目');
+                return;
+            }
+            
+            // 随机选择题目
+            const selectedQuestions = [];
+            const actualCount = Math.min(questionCount, availableQuestions.length);
+            
+            for (let i = 0; i < actualCount; i++) {
+                const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+                selectedQuestions.push(availableQuestions.splice(randomIndex, 1)[0]);
+            }
+            
+            currentExam = {
+                questions: selectedQuestions,
+                currentIndex: 0,
+                correctCount: 0,
+                startTime: Date.now(),
+                isActive: true
+            };
+            
+            document.getElementById('examConfig').style.display = 'none';
+            document.getElementById('examContent').style.display = 'block';
+            document.getElementById('examTotal').textContent = actualCount;
+            
+            loadExamQuestion();
+        }
+
+        // 加载考试题目
+        function loadExamQuestion() {
+            if (currentExam.currentIndex >= currentExam.questions.length) {
+                finishExam();
+                return;
+            }
+            
+            const question = currentExam.questions[currentExam.currentIndex];
+            const progress = ((currentExam.currentIndex + 1) / currentExam.questions.length) * 100;
+            
+            document.getElementById('examProgressBar').style.width = progress + '%';
+            document.getElementById('examCurrent').textContent = currentExam.currentIndex + 1;
+            document.getElementById('examCorrect').textContent = currentExam.correctCount;
+            
+            renderExamQuestion(question);
+        }
+
+        // 渲染考试题目
+        function renderExamQuestion(question) {
+            const container = document.getElementById('examQuestionContainer');
+            
+            if (question.type === 'fill') {
+                const blanks = (question.question.match(/_____/g) || []).length;
+                let questionHtml = question.question;
+                for (let i = 0; i < blanks; i++) {
+                    questionHtml = questionHtml.replace('_____', `<input type="text" class="answer-input" data-index="${i}">`);
+                }
+                
+                container.innerHTML = `
+                    <div class="question-card">
+                        <span class="question-type">填空题</span>
+                        <div class="question-text fill-blank">${questionHtml}</div>
+                        <div class="buttons">
+                            <button class="btn btn-primary" onclick="submitExamFillAnswer()">提交答案</button>
+                            <button class="btn btn-warning" onclick="markAsCorrect()">此题答对了</button>
+                        </div>
+                        <div id="examResult"></div>
+                    </div>
+                `;
+            } else if (question.type === 'choice') {
+                const optionsHtml = question.options.map((option, index) => 
+                    `<label class="option" onclick="selectExamOption(this, '${option.charAt(0)}')">
+                        <input type="radio" name="examChoice" value="${option.charAt(0)}" style="display:none;">
+                        ${option}
+                    </label>`
+                ).join('');
+
+                container.innerHTML = `
+                    <div class="question-card">
+                        <span class="question-type">选择题</span>
+                        <div class="question-text">${question.question}</div>
+                        <div class="options">${optionsHtml}</div>
+                        <div class="buttons">
+                            <button class="btn btn-primary" onclick="submitExamChoiceAnswer()">提交答案</button>
+                            <button class="btn btn-warning" onclick="markAsCorrect()">此题答对了</button>
+                        </div>
+                        <div id="examResult"></div>
+                    </div>
+                `;
+            } else if (question.type === 'essay') {
+                container.innerHTML = `
+                    <div class="question-card">
+                        <span class="question-type">简答题</span>
+                        <div class="question-text">${question.question}</div>
+                        <div class="form-group">
+                            <label>你的答案：</label>
+                            <textarea id="essayAnswer" rows="6" placeholder="请输入你的答案..."></textarea>
+                        </div>
+                        <div class="buttons">
+                            <button class="btn btn-primary" onclick="submitEssayAnswer()">查看参考答案</button>
+                            <button class="btn btn-success" onclick="markEssayCorrect()">答对了</button>
+                            <button class="btn btn-secondary" onclick="markEssayWrong()">答错了</button>
+                        </div>
+                        <div id="examResult"></div>
+                    </div>
+                `;
+            }
+        }
+
+        // 选择考试选项
+        function selectExamOption(element, value) {
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            element.querySelector('input').checked = true;
+        }
+
+        // 提交考试填空题答案
+        function submitExamFillAnswer() {
+            const question = currentExam.questions[currentExam.currentIndex];
+            const inputs = document.querySelectorAll('.answer-input');
+            const userAnswers = Array.from(inputs).map(input => input.value.trim());
+            const correctAnswers = question.answer.split(';').map(ans => ans.trim());
+            
+            let isCorrect = true;
+            if (userAnswers.length !== correctAnswers.length) {
+                isCorrect = false;
+            } else {
+                for (let i = 0; i < userAnswers.length; i++) {
+                    if (userAnswers[i].toLowerCase() !== correctAnswers[i].toLowerCase()) {
+                        isCorrect = false;
+                        break;
+                    }
+                }
+            }
+            
+            // 标记输入框
+            inputs.forEach((input, index) => {
+                if (index < correctAnswers.length) {
+                    const userAns = input.value.trim().toLowerCase();
+                    const correctAns = correctAnswers[index].toLowerCase();
+                    input.classList.add(userAns === correctAns ? 'correct' : 'wrong');
+                }
+            });
+            
+            // 记录答题情况
+            recordExamAnswer(question, userAnswers.join(';'), isCorrect);
+            
+            showExamResult(isCorrect, `正确答案：${correctAnswers.join(' ; ')}`);
+            if (isCorrect) {
+                currentExam.correctCount++;
+            }
+        }
+
+        // 提交考试选择题答案
+        function submitExamChoiceAnswer() {
+            const question = currentExam.questions[currentExam.currentIndex];
+            const selectedOption = document.querySelector('input[name="examChoice"]:checked');
+            if (!selectedOption) {
+                alert('请选择一个答案');
+                return;
+            }
+            
+            const userAnswer = selectedOption.value;
+            const isCorrect = userAnswer === question.answer;
+            
+            // 标记所有选项
+            document.querySelectorAll('.option').forEach(option => {
+                const optionValue = option.querySelector('input').value;
+                if (optionValue === question.answer) {
+                    option.classList.add('correct');
+                } else if (optionValue === userAnswer && !isCorrect) {
+                    option.classList.add('wrong');
+                }
+            });
+            
+            // 记录答题情况
+            recordExamAnswer(question, userAnswer, isCorrect);
+            
+            showExamResult(isCorrect, `正确答案是：${question.answer}`);
+            if (isCorrect) {
+                currentExam.correctCount++;
+            }
+        }
+
+        // 记录考试答题情况
+        function recordExamAnswer(question, userAnswer, isCorrect) {
+            const answerRecord = {
+                question: question,
+                userAnswer: userAnswer,
+                isCorrect: isCorrect,
+                timestamp: new Date().toLocaleString()
+            };
+            
+            currentExam.answers.push(answerRecord);
+            
+            if (!isCorrect) {
+                currentExam.wrongQuestionIndexes.push(currentExam.currentIndex);
+                // 添加到错题本（避免重复）
+                const existingWrong = wrongQuestions.find(wq => 
+                    wq.question.question === question.question && wq.question.type === question.type
+                );
+                if (!existingWrong) {
+                    wrongQuestions.push(answerRecord);
+                }
+            }
+        }
+
+        // 提交简答题答案
+        function submitEssayAnswer() {
+            const question = currentExam.questions[currentExam.currentIndex];
+            const userAnswer = document.getElementById('essayAnswer').value.trim();
+            
+            if (!userAnswer) {
+                alert('请先输入你的答案');
+                return;
+            }
+            
+            // 计算相似度
+            const similarity = calculateSimilarity(userAnswer, question.answer);
+            
+            const resultHtml = `
+                <div class="result info">
+                    <h4>参考答案：</h4>
+                    <p>${question.answer}</p>
+                    <div class="similarity-score">
+                        <strong>与参考答案相似度：${similarity.toFixed(1)}%</strong>
+                        <br><small>相似度越高说明答案越接近参考答案</small>
+                    </div>
+                    <p style="margin-top: 10px;"><strong>请根据参考答案自行判断你的回答是否正确</strong></p>
+                </div>
+            `;
+            
+            document.getElementById('examResult').innerHTML = resultHtml;
+        }
+
+        // 计算文本相似度
+        function calculateSimilarity(text1, text2) {
+            const words1 = text1.replace(/[^\u4e00-\u9fa5\w]/g, '').split('');
+            const words2 = text2.replace(/[^\u4e00-\u9fa5\w]/g, '').split('');
+            
+            const commonChars = words1.filter(char => words2.includes(char));
+            const totalChars = Math.max(words1.length, words2.length);
+            
+            return totalChars > 0 ? (commonChars.length / totalChars) * 100 : 0;
+        }
+
+        // 标记简答题正确
+        function markEssayCorrect() {
+            currentExam.correctCount++;
+            showExamResult(true, '已标记为正确答案');
+        }
+
+        // 标记简答题错误
+        function markEssayWrong() {
+            showExamResult(false, '已标记为错误答案');
+        }
+
+        // 显示考试结果
+        function showExamResult(isCorrect, message) {
+            const resultDiv = document.getElementById('examResult');
+            resultDiv.className = `result ${isCorrect ? 'correct' : 'wrong'}`;
+            resultDiv.innerHTML = isCorrect ? 
+                '✅ 回答正确！' : 
+                `❌ 回答错误！<br>${message}`;
+        }
+
+        // 手动标记为正确
+        function markAsCorrect() {
+            currentExam.correctCount++;
+            showExamResult(true, '已手动标记为正确');
+        }
+
+        // 下一道考试题目
+        function nextExamQuestion() {
+            currentExam.currentIndex++;
+            loadExamQuestion();
+        }
+
+        // 完成考试
+        function finishExam() {
+            const endTime = Date.now();
+            const duration = Math.round((endTime - currentExam.startTime) / 60000);
+            const accuracy = Math.round((currentExam.correctCount / currentExam.questions.length) * 100);
+            const grade = Math.round(accuracy); // 百分制成绩
+            
+            // 更新考试统计
+            stats.totalExams++;
+            stats.totalCorrectAnswers += currentExam.correctCount;
+            stats.totalQuestions += currentExam.questions.length;
+            
+            document.getElementById('examContent').style.display = 'none';
+            document.getElementById('examResult').style.display = 'block';
+            
+            // 显示详细成绩
+            document.getElementById('finalCorrect').textContent = currentExam.correctCount;
+            document.getElementById('finalTotal').textContent = currentExam.questions.length;
+            document.getElementById('finalAccuracy').textContent = accuracy + '%';
+            document.getElementById('finalTime').textContent = duration;
+            document.getElementById('gradeDisplay').textContent = grade + '分';
+            
+            // 成绩评价
+            let comment = '';
+            let gradeColor = '';
+            if (grade >= 90) {
+                comment = '优秀！继续保持！';
+                gradeColor = '#4CAF50';
+            } else if (grade >= 80) {
+                comment = '良好！还有进步空间！';
+                gradeColor = '#2196F3';
+            } else if (grade >= 70) {
+                comment = '中等！需要加强练习！';
+                gradeColor = '#FF9800';
+            } else if (grade >= 60) {
+                comment = '及格！建议重点复习！';
+                gradeColor = '#FF5722';
+            } else {
+                comment = '需要努力！建议系统复习！';
+                gradeColor = '#f44336';
+            }
+            
+            document.getElementById('gradeComment').textContent = comment;
+            document.getElementById('gradeDisplay').style.color = gradeColor;
+            
+            // 显示错题按钮
+            const wrongCount = currentExam.wrongQuestionIndexes.length;
+            if (wrongCount > 0) {
+                const wrongBtn = document.getElementById('wrongQuestionsBtn');
+                wrongBtn.style.display = 'inline-block';
+                wrongBtn.textContent = `查看错题 (${wrongCount})`;
+            }
+            
+            currentExam.isActive = false;
+            saveWrongQuestions();
+            saveStats();
+            updateStats();
+            updateWrongQuestionsDisplay();
+        }
+
+        // 结束考试
+        function endExam() {
+            if (confirm('确定要结束当前考试吗？')) {
+                finishExam();
+            }
+        }
+
+        // 重置考试
+        function resetExam() {
+            document.getElementById('examResult').style.display = 'none';
+            document.getElementById('examConfig').style.display = 'block';
+            document.getElementById('wrongQuestionsSection').style.display = 'none';
+            currentExam = {
+                questions: [],
+                currentIndex: 0,
+                correctCount: 0,
+                startTime: null,
+                isActive: false,
+                answers: [],
+                wrongQuestionIndexes: []
+            };
+        }
+
+        // 显示本次考试错题
+        function showWrongQuestions() {
+            const section = document.getElementById('wrongQuestionsSection');
+            const container = document.getElementById('currentExamWrongQuestions');
+            
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                
+                const wrongQuestions = currentExam.wrongQuestionIndexes.map(index => ({
+                    question: currentExam.questions[index],
+                    answer: currentExam.answers[index]
+                }));
+                
+                container.innerHTML = wrongQuestions.map((item, index) => {
+                    return renderQuestionCard(item.question, index, item.answer.userAnswer, false, true);
+                }).join('');
+                
+                document.getElementById('wrongQuestionsBtn').textContent = '隐藏错题';
+            } else {
+                section.style.display = 'none';
+                document.getElementById('wrongQuestionsBtn').textContent = `查看错题 (${currentExam.wrongQuestionIndexes.length})`;
+            }
+        }
+
+        // 渲染题目卡片（通用函数）
+        function renderQuestionCard(question, index, userAnswer = '', showBookmarkBtn = false, showUserAnswer = false) {
+            const questionTypeText = question.type === 'fill' ? '填空题' : 
+                                   question.type === 'choice' ? '选择题' : '简答题';
+            
+            let userAnswerHtml = '';
+            if (showUserAnswer && userAnswer) {
+                userAnswerHtml = `
+                    <div style="margin-top: 15px; padding: 10px; background: #ffebee; border-radius: 5px;">
+                        <strong>你的答案：</strong>${userAnswer}
+                    </div>
+                `;
+            }
+            
+            let optionsHtml = '';
+            if (question.options) {
+                optionsHtml = `
+                    <div style="margin-top: 10px;">
+                        <strong>选项：</strong><br>
+                        ${question.options.join('<br>')}
+                    </div>
+                `;
+            }
+            
+            let bookmarkBtnHtml = '';
+            if (showBookmarkBtn) {
+                const isBookmarked = bookmarkedQuestions.some(bq => 
+                    bq.question === question.question && bq.type === question.type
+                );
+                bookmarkBtnHtml = `
+                    <button class="btn ${isBookmarked ? 'btn-warning' : 'btn-secondary'}" 
+                            onclick="toggleBookmark(${index}, '${question.type}')">
+                        ${isBookmarked ? '取消收藏' : '收藏题目'}
+                    </button>
+                `;
+            }
+            
+            return `
+                <div class="question-card">
+                    <span class="question-type">${questionTypeText}</span>
+                    <div class="question-text">${question.question}</div>
+                    ${optionsHtml}
+                    ${userAnswerHtml}
+                    <div style="margin-top: 15px; padding: 10px; background: #e8f5e8; border-radius: 5px;">
+                        <strong>正确答案：</strong>${question.answer}
+                    </div>
+                    <div style="margin-top: 10px;">
+                        ${bookmarkBtnHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 更新错题本显示
+        function updateWrongQuestionsDisplay() {
+            const container = document.getElementById('wrongQuestionsContainer');
+            const count = document.getElementById('wrongQuestionsCount');
+            const rate = document.getElementById('wrongQuestionsRate');
+            
+            count.textContent = wrongQuestions.length;
+            
+            const totalAnswered = stats.practiceStats.totalAnswered + stats.totalQuestions;
+            const wrongRate = totalAnswered > 0 ? Math.round((wrongQuestions.length / totalAnswered) * 100) : 0;
+            rate.textContent = wrongRate + '%';
+            
+            if (wrongQuestions.length === 0) {
+                container.innerHTML = '<p>暂无错题，继续努力！</p>';
+                return;
+            }
+            
+            container.innerHTML = wrongQuestions.map((item, index) => {
+                return renderQuestionCard(item.question, index, item.userAnswer, true, true);
+            }).join('');
+        }
+
+        // 更新书签显示
+        function updateBookmarksDisplay() {
+            const container = document.getElementById('bookmarksContainer');
+            const count = document.getElementById('bookmarksCount');
+            
+            count.textContent = bookmarkedQuestions.length;
+            
+            if (bookmarkedQuestions.length === 0) {
+                container.innerHTML = '<p>暂无收藏题目</p>';
+                return;
+            }
+            
+            container.innerHTML = bookmarkedQuestions.map((question, index) => {
+                return renderQuestionCard(question, index, '', true, false);
+            }).join('');
+        }
+
+        // 切换书签状态
+        function toggleBookmark(index, type) {
+            let question;
+            if (type === 'wrong') {
+                question = wrongQuestions[index].question;
+            } else {
+                question = wrongQuestions[index].question; // 临时处理，实际需要根据具体情况调整
+            }
+            
+            const existingIndex = bookmarkedQuestions.findIndex(bq => 
+                bq.question === question.question && bq.type === question.type
+            );
+            
+            if (existingIndex >= 0) {
+                bookmarkedQuestions.splice(existingIndex, 1);
+            } else {
+                bookmarkedQuestions.push(question);
+            }
+            
+            saveBookmarks();
+            updateBookmarksDisplay();
+            updateWrongQuestionsDisplay();
+        }
+
+        // 专项练习错题
+        function practiceWrongQuestions() {
+            if (wrongQuestions.length === 0) {
+                alert('错题本为空');
+                return;
+            }
+            
+            showSection('practice');
+            // 这里可以实现专门的错题练习逻辑
+            alert('错题专项练习功能开发中...');
+        }
+
+        // 专项练习书签题目
+        function practiceBookmarkedQuestions() {
+            if (bookmarkedQuestions.length === 0) {
+                alert('书签为空');
+                return;
+            }
+            
+            showSection('practice');
+            alert('书签专项练习功能开发中...');
+        }
+
+        // 清空错题本
+        function clearWrongQuestions() {
+            if (confirm('确定要清空错题本吗？')) {
+                wrongQuestions = [];
+                saveWrongQuestions();
+                updateWrongQuestionsDisplay();
+                alert('错题本已清空');
+            }
+        }
+
+        // 清空书签
+        function clearBookmarks() {
+            if (confirm('确定要清空所有书签吗？')) {
+                bookmarkedQuestions = [];
+                saveBookmarks();
+                updateBookmarksDisplay();
+                alert('书签已清空');
+            }
+        }
+
+        // 保存错题
+        function saveWrongQuestions() {
+            localStorage.setItem('wrongQuestions', JSON.stringify(wrongQuestions));
+        }
+
+        // 保存书签
+        function saveBookmarks() {
+            localStorage.setItem('bookmarkedQuestions', JSON.stringify(bookmarkedQuestions));
+        }
+
+        // 自由练习相关函数
+        function loadPracticeQuestion() {
+            const fullBank = getFullQuestionBank();
+            if (fullBank.length === 0) {
+                document.getElementById('questionContainer').innerHTML = '<p>暂无题目，请先添加题目。</p>';
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * fullBank.length);
+            currentQuestion = fullBank[randomIndex];
+            practiceAnswered = false;
+
+            renderPracticeQuestion();
+        }
+
+        // 渲染自由练习题目
+        function renderPracticeQuestion() {
+            const container = document.getElementById('questionContainer');
+            
+            if (currentQuestion.type === 'fill') {
+                const blanks = (currentQuestion.question.match(/_____/g) || []).length;
+                let questionHtml = currentQuestion.question;
+                for (let i = 0; i < blanks; i++) {
+                    questionHtml = questionHtml.replace('_____', `<input type="text" class="answer-input" data-index="${i}">`);
+                }
+                
+                container.innerHTML = `
+                    <div class="question-card">
+                        <span class="question-type">填空题</span>
+                        <div class="question-text fill-blank">${questionHtml}</div>
+                        <div class="buttons">
+                            <button class="btn btn-primary" onclick="checkPracticeFillAnswer()">提交答案</button>
+                            <button class="btn btn-warning" onclick="markPracticeCorrect()">此题答对了</button>
+                            <button class="btn btn-secondary" onclick="loadPracticeQuestion()">下一题</button>
+                        </div>
+                        <div id="practiceResult"></div>
+                    </div>
+                `;
+            } else if (currentQuestion.type === 'choice') {
+                const optionsHtml = currentQuestion.options.map((option, index) => 
+                    `<label class="option" onclick="selectPracticeOption(this, '${option.charAt(0)}')">
+                        <input type="radio" name="practiceChoice" value="${option.charAt(0)}" style="display:none;">
+                        ${option}
+                    </label>`
+                ).join('');
+
+                container.innerHTML = `
+                    <div class="question-card">
+                        <span class="question-type">选择题</span>
+                        <div class="question-text">${currentQuestion.question}</div>
+                        <div class="options">${optionsHtml}</div>
+                        <div class="buttons">
+                            <button class="btn btn-primary" onclick="checkPracticeChoiceAnswer()">提交答案</button>
+                            <button class="btn btn-warning" onclick="markPracticeCorrect()">此题答对了</button>
+                            <button class="btn btn-secondary" onclick="loadPracticeQuestion()">下一题</button>
+                        </div>
+                        <div id="practiceResult"></div>
+                    </div>
+                `;
+            } else if (currentQuestion.type === 'essay') {
+                container.innerHTML = `
+                    <div class="question-card">
+                        <span class="question-type">简答题</span>
+                        <div class="question-text">${currentQuestion.question}</div>
+                        <div class="form-group">
+                            <label>你的答案：</label>
+                            <textarea id="practiceEssayAnswer" rows="6" placeholder="请输入你的答案..."></textarea>
+                        </div>
+                        <div class="buttons">
+                            <button class="btn btn-primary" onclick="checkPracticeEssayAnswer()">查看参考答案</button>
+                            <button class="btn btn-success" onclick="markPracticeEssayCorrect()">答对了</button>
+                            <button class="btn btn-secondary" onclick="markPracticeEssayWrong()">答错了</button>
+                            <button class="btn btn-secondary" onclick="loadPracticeQuestion()">下一题</button>
+                        </div>
+                        <div id="practiceResult"></div>
+                    </div>
+                `;
+            }
+        }
+
+        // 选择自由练习选项
+        function selectPracticeOption(element, value) {
+            if (practiceAnswered) return;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            element.querySelector('input').checked = true;
+        }
+
+        // 检查自由练习填空题答案
+        function checkPracticeFillAnswer() {
+            if (practiceAnswered) return;
+            
+            const inputs = document.querySelectorAll('.answer-input');
+            const userAnswers = Array.from(inputs).map(input => input.value.trim());
+            const correctAnswers = currentQuestion.answer.split(';').map(ans => ans.trim());
+            
+            let isCorrect = true;
+            if (userAnswers.length !== correctAnswers.length) {
+                isCorrect = false;
+            } else {
+                for (let i = 0; i < userAnswers.length; i++) {
+                    if (userAnswers[i].toLowerCase() !== correctAnswers[i].toLowerCase()) {
+                        isCorrect = false;
+                        break;
+                    }
+                }
+            }
+            
+
+            
+            showPracticeResult(isCorrect, `正确答案：${correctAnswers.join(' ; ')}`);
+            updatePracticeStats(isCorrect);
+        }
+
+        // 检查自由练习选择题答案
+        function checkPracticeChoiceAnswer() {
+            if (practiceAnswered) return;
+            
+            const selectedOption = document.querySelector('input[name="practiceChoice"]:checked');
+            if (!selectedOption) {
+                alert('请选择一个答案');
+                return;
+            }
+            
+            const userAnswer = selectedOption.value;
+            const isCorrect = userAnswer === currentQuestion.answer;
+            
+            document.querySelectorAll('.option').forEach(option => {
+                const optionValue = option.querySelector('input').value;
+                if (optionValue === currentQuestion.answer) {
+                    option.classList.add('correct');
+                } else if (optionValue === userAnswer && !isCorrect) {
+                    option.classList.add('wrong');
+                }
+            });
+            
+            showPracticeResult(isCorrect, `正确答案是：${currentQuestion.answer}`);
+            updatePracticeStats(isCorrect);
+        }
+
+        // 检查自由练习简答题答案
+        function checkPracticeEssayAnswer() {
+            const userAnswer = document.getElementById('practiceEssayAnswer').value.trim();
+            
+            if (!userAnswer) {
+                alert('请先输入你的答案');
+                return;
+            }
+            
+            const similarity = calculateSimilarity(userAnswer, currentQuestion.answer);
+            
+            const resultHtml = `
+                <div class="result info">
+                    <h4>参考答案：</h4>
+                    <p>${currentQuestion.answer}</p>
+                    <div class="similarity-score">
+                        <strong>与参考答案相似度：${similarity.toFixed(1)}%</strong>
+                        <br><small>相似度越高说明答案越接近参考答案</small>
+                    </div>
+                    <p style="margin-top: 10px;"><strong>请根据参考答案自行判断你的回答是否正确</strong></p>
+                </div>
+            `;
+            
+            document.getElementById('practiceResult').innerHTML = resultHtml;
+        }
+
+		// 标记自由练习题目正确
+		function markPracticeCorrect() {
+			if (practiceAnswered) {
+				// 如果已经答过题（且答错了），需要修正统计
+				// 减少错误计数，增加正确计数
+				stats.practiceStats.correctAnswers++;
+				stats.currentStreak++;
+				stats.bestStreak = Math.max(stats.bestStreak, stats.currentStreak);
+				updateStats();
+				saveStats();
+			} else {
+				// 如果还没答过题，正常处理
+				updatePracticeStats(true);
+			}
+			showPracticeResult(true, '已标记为正确答案');
+		}
+
+        // 标记自由练习简答题正确
+        function markPracticeEssayCorrect() {
+            updatePracticeStats(true);
+            showPracticeResult(true, '已标记为正确答案');
+        }
+
+        // 标记自由练习简答题错误
+        function markPracticeEssayWrong() {
+            updatePracticeStats(false);
+            showPracticeResult(false, '已标记为错误答案');
+        }
+
+        // 显示自由练习结果
+        function showPracticeResult(isCorrect, message) {
+            practiceAnswered = true;
+            const resultDiv = document.getElementById('practiceResult');
+            resultDiv.className = `result ${isCorrect ? 'correct' : 'wrong'}`;
+            resultDiv.innerHTML = isCorrect ? 
+                '✅ 回答正确！' : 
+                `❌ 回答错误！<br>${message}`;
+        }
+
+        // 更新自由练习统计
+        function updatePracticeStats(isCorrect) {
+            stats.practiceStats.totalAnswered++;
+            if (isCorrect) {
+                stats.practiceStats.correctAnswers++;
+                stats.currentStreak++;
+                stats.bestStreak = Math.max(stats.bestStreak, stats.currentStreak);
+            } else {
+                stats.currentStreak = 0;
+            }
+            updateStats();
+            saveStats();
+        }
+
+        // 更新统计显示
+        function updateStats() {
+            const fullBank = getFullQuestionBank();
+            document.getElementById('totalQuestions').textContent = fullBank.length;
+            document.getElementById('correctCount').textContent = stats.practiceStats.correctAnswers;
+            document.getElementById('wrongCount').textContent = stats.practiceStats.totalAnswered - stats.practiceStats.correctAnswers;
+            
+            const practiceAccuracy = stats.practiceStats.totalAnswered > 0 ? 
+                Math.round((stats.practiceStats.correctAnswers / stats.practiceStats.totalAnswered) * 100) : 0;
+            document.getElementById('accuracy').textContent = practiceAccuracy + '%';
+            
+            // 统计页面
+            document.getElementById('totalExams').textContent = stats.totalExams;
+            const overallAccuracy = stats.totalQuestions > 0 ? 
+                Math.round((stats.totalCorrectAnswers / stats.totalQuestions) * 100) : 0;
+            document.getElementById('avgAccuracy').textContent = overallAccuracy + '%';
+            document.getElementById('bestStreak').textContent = stats.bestStreak;
+            
+            const studyTime = Math.round((Date.now() - stats.studyStartTime) / 60000);
+            document.getElementById('studyTime').textContent = studyTime;
+        }
+
+        // 切换选项输入显示
+        function toggleOptions() {
+            const type = document.getElementById('questionType').value;
+            const optionInputs = document.getElementById('optionInputs');
+            
+            if (type === 'choice') {
+                optionInputs.classList.add('show');
+            } else {
+                optionInputs.classList.remove('show');
+            }
+        }
+
+        // 添加题目
+        function addQuestion() {
+            const type = document.getElementById('questionType').value;
+            const questionText = document.getElementById('questionText').value.trim();
+            const correctAnswer = document.getElementById('correctAnswer').value.trim();
+            
+            if (!questionText || !correctAnswer) {
+                alert('请填写题目内容和正确答案');
+                return;
+            }
+            
+            const newQuestion = {
+                type: type,
+                question: questionText,
+                answer: correctAnswer,
+                category: '自定义'
+            };
+            
+            if (type === 'choice') {
+                const optionA = document.getElementById('optionA').value.trim();
+                const optionB = document.getElementById('optionB').value.trim();
+                const optionC = document.getElementById('optionC').value.trim();
+                const optionD = document.getElementById('optionD').value.trim();
+                
+                if (!optionA || !optionB || !optionC || !optionD) {
+                    alert('请填写所有选项');
+                    return;
+                }
+                
+                newQuestion.options = [
+                    'A. ' + optionA,
+                    'B. ' + optionB,
+                    'C. ' + optionC,
+                    'D. ' + optionD
+                ];
+            }
+            
+            customQuestionBank.push(newQuestion);
+            saveCustomQuestions();
+            updateQuestionBank();
+            updateStats();
+            clearForm();
+            alert('题目添加成功！');
+        }
+
+        // 清空表单
+        function clearForm() {
+            document.getElementById('questionText').value = '';
+            document.getElementById('correctAnswer').value = '';
+            document.getElementById('optionA').value = '';
+            document.getElementById('optionB').value = '';
+            document.getElementById('optionC').value = '';
+            document.getElementById('optionD').value = '';
+        }
+
+        // 更新题库显示
+        function updateQuestionBank() {
+            const container = document.getElementById('questionBank');
+            const fullBank = getFullQuestionBank();
+            
+            if (fullBank.length === 0) {
+                container.innerHTML = '<p>暂无题目</p>';
+                return;
+            }
+            
+            const html = fullBank.map((q, index) => {
+                const isCustom = index >= builtInQuestionBank.length;
+                const deleteButton = isCustom ? 
+                    `<button class="btn btn-secondary" onclick="deleteQuestion(${index - builtInQuestionBank.length})">删除</button>` : 
+                    '<span style="color: #666;">(内置题目)</span>';
+                
+                return `
+                    <div class="question-card">
+                        <span class="question-type">${q.type === 'fill' ? '填空题' : q.type === 'choice' ? '选择题' : '简答题'}</span>
+                        <div class="question-text">${q.question}</div>
+                        <div style="margin-top: 10px;">
+                            <strong>正确答案：</strong>${q.answer}
+                        </div>
+                        ${q.options ? `<div style="margin-top: 10px;"><strong>选项：</strong><br>${q.options.join('<br>')}</div>` : ''}
+                        <div style="margin-top: 10px;">
+                            ${deleteButton}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
+
+        // 删除自定义题目
+        function deleteQuestion(index) {
+            if (confirm('确定要删除这道题目吗？')) {
+                customQuestionBank.splice(index, 1);
+                saveCustomQuestions();
+                updateQuestionBank();
+                updateStats();
+            }
+        }
+
+        // 保存统计数据
+        function saveStats() {
+            localStorage.setItem('bioreactorStats', JSON.stringify(stats));
+        }
+
+        // 保存自定义题目
+        function saveCustomQuestions() {
+            localStorage.setItem('customQuestionBank', JSON.stringify(customQuestionBank));
+        }
+
+        // 加载存储的数据
+        function loadStoredData() {
+            // 加载统计数据
+            const storedStats = localStorage.getItem('bioreactorStats');
+            if (storedStats) {
+                const parsedStats = JSON.parse(storedStats);
+                stats = {...stats, ...parsedStats};
+            }
+            
+            // 加载自定义题目
+            const storedQuestions = localStorage.getItem('customQuestionBank');
+            if (storedQuestions) {
+                customQuestionBank = JSON.parse(storedQuestions);
+            }
+        }
+
+        // 清零学习统计
+        function clearStats() {
+            if (confirm('确定要清零所有学习统计数据吗？此操作不可恢复！\n\n将清零以下数据：\n• 考试次数\n• 平均正确率\n• 最长连对记录\n• 学习时长\n• 自由练习记录')) {
+                stats = {
+                    totalExams: 0,
+                    totalCorrectAnswers: 0,
+                    totalQuestions: 0,
+                    currentStreak: 0,
+                    bestStreak: 0,
+                    studyStartTime: Date.now(),
+                    practiceStats: {
+                        totalAnswered: 0,
+                        correctAnswers: 0
+                    }
+                };
+                
+                // 清除本地存储的统计数据
+                localStorage.removeItem('bioreactorStats');
+                
+                // 更新显示
+                updateStats();
+                
+                alert('学习统计数据已清零！');
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
