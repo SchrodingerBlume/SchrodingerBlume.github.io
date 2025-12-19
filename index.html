@@ -3,393 +3,1263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>生化真题智能训练系统 (全能版)</title>
+    <title>生化考研答题系统</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f5f6fa; --card: #fff; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--primary); margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; }
-        .card { background: var(--card); padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        h1, h2, h3 { text-align: center; color: var(--primary); }
-        .btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; transition: 0.2s; }
-        .btn:hover { background: #2980b9; }
-        .btn-outline { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
-        .btn-outline:hover { background: var(--accent); color: white; }
-        .btn-disabled { opacity: 0.5; cursor: not-allowed; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0 15px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        .question-box { border-left: 5px solid var(--accent); padding-left: 20px; margin: 20px 0; }
-        .meta { background: #e1f0fa; color: var(--accent); padding: 3px 8px; border-radius: 4px; font-size: 12px; margin-right: 5px; font-weight: bold; }
-        .hidden { display: none !important; }
-        .timer { font-size: 2em; color: #e74c3c; text-align: center; font-family: monospace; }
-        .ai-feedback { background: #f8f9fa; border: 1px dashed #ccc; padding: 15px; margin-top: 15px; border-radius: 5px; }
-        .loading { color: #f39c12; font-weight: bold; }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #2c5f2d;
+            --primary-light: #4a8b4d;
+            --primary-dark: #1a3a1b;
+            --secondary: #d4af37;
+            --accent: #c41e3a;
+            --bg: #faf8f5;
+            --surface: #ffffff;
+            --text: #1a1a1a;
+            --text-secondary: #666;
+            --border: #e0d8cc;
+            --shadow: rgba(44, 95, 45, 0.15);
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #faf8f5 0%, #f5f1e8 100%);
+            color: var(--text);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(44, 95, 45, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        header {
+            text-align: center;
+            padding: 3rem 0;
+            position: relative;
+        }
+        
+        h1 {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px var(--shadow);
+            letter-spacing: 0.05em;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+        
+        .mode-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .mode-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px var(--shadow);
+            border: 2px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .mode-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 48px var(--shadow);
+            border-color: var(--primary);
+        }
+        
+        .mode-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .mode-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .mode-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .mode-desc {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        .mode-features {
+            list-style: none;
+            margin-top: 1rem;
+        }
+        
+        .mode-features li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .mode-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .config-panel {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px var(--shadow);
+            border: 2px solid var(--border);
+            margin: 2rem 0;
+            display: none;
+        }
+        
+        .config-panel.active {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .form-group {
+            margin-bottom: 2rem;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        
+        .question-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .type-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .type-option:hover {
+            background: white;
+            border-color: var(--primary-light);
+        }
+        
+        .type-option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+        
+        .type-option input[type="number"] {
+            width: 70px;
+            padding: 0.4rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            text-align: center;
+            font-size: 1rem;
+        }
+        
+        select, input[type="number"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            transition: border-color 0.2s;
+        }
+        
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(44, 95, 45, 0.3);
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(44, 95, 45, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--text-secondary), #888);
+            margin-left: 1rem;
+        }
+        
+        .quiz-container {
+            display: none;
+        }
+        
+        .quiz-container.active {
+            display: block;
+        }
+        
+        .question-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px var(--shadow);
+            border: 2px solid var(--border);
+            margin: 2rem 0;
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .question-info {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        
+        .info-badge {
+            padding: 0.5rem 1rem;
+            background: var(--bg);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .timer {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .timer.warning {
+            color: var(--accent);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .question-content {
+            margin: 2rem 0;
+        }
+        
+        .question-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: var(--text);
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+        
+        .answer-area {
+            margin-top: 2rem;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 1.5rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Noto Sans SC', sans-serif;
+            line-height: 1.6;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .answer-feedback {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .answer-feedback.show {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+        
+        .answer-feedback.correct {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+        }
+        
+        .answer-feedback.partial {
+            background: #fff8e1;
+            border: 2px solid #ffc107;
+        }
+        
+        .answer-feedback.incorrect {
+            background: #ffebee;
+            border: 2px solid #f44336;
+        }
+        
+        .feedback-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .reference-answer {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .reference-title {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+        
+        .ai-analysis {
+            background: #f0f7ff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .ai-title {
+            font-weight: 600;
+            color: #2196f3;
+            margin-bottom: 0.75rem;
+        }
+        
+        .results-panel {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px var(--shadow);
+            border: 2px solid var(--border);
+            margin: 2rem 0;
+            display: none;
+        }
+        
+        .results-panel.active {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+        
+        .score-display {
+            text-align: center;
+            padding: 3rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 12px;
+            color: white;
+            margin-bottom: 2rem;
+        }
+        
+        .score-number {
+            font-size: 4rem;
+            font-weight: 700;
+            font-family: 'Noto Serif SC', serif;
+        }
+        
+        .score-label {
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+            opacity: 0.9;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: var(--bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+        
+        .review-list {
+            margin-top: 2rem;
+        }
+        
+        .review-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 2px solid var(--border);
+        }
+        
+        .review-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .review-question {
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .review-score {
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .review-score.correct {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .review-score.partial {
+            background: #fff8e1;
+            color: #f57c00;
+        }
+        
+        .review-score.incorrect {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            transition: width 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .mode-selector {
+                grid-template-columns: 1fr;
+            }
+            
+            .question-type-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-secondary {
+                margin-left: 0;
+                margin-top: 1rem;
+            }
+        }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <div class="card">
-            <h1>🧬 生化考研真题训练</h1>
-            <p style="text-align:center; color:#7f8c8d;">全题型覆盖 · 阿里百炼AI严格判卷</p>
-        </div>
-
-        <div id="setup-panel" class="card">
-            <h2>⚙️ 考试设置</h2>
-            
-            <label>运行模式</label>
-            <div style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
-                <button class="btn" id="mode-train" onclick="setMode('training')">🏋️ 训练模式 (做一题对一题)</button>
-                <button class="btn btn-outline" id="mode-exam" onclick="setMode('exam')">📝 考试模式 (限时交卷)</button>
+        <header>
+            <h1>生化考研答题系统</h1>
+            <p class="subtitle">Biochemistry Examination System</p>
+        </header>
+        
+        <!-- 模式选择 -->
+        <div id="modeSelection" class="mode-selector">
+            <div class="mode-card" onclick="selectMode('exam')">
+                <div class="mode-icon">📝</div>
+                <h2 class="mode-title">考试模式</h2>
+                <p class="mode-desc">模拟真实考试环境，限时答题，全面检验实力</p>
+                <ul class="mode-features">
+                    <li>限定答题时间</li>
+                    <li>完成后统一判分</li>
+                    <li>AI智能评阅</li>
+                    <li>成绩分析报告</li>
+                </ul>
             </div>
-
-            <div class="card" style="background:#f8f9fa;">
-                <label>抽题数量设置</label>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                    <div><label>名词解释</label><input type="number" id="num-noun" value="5"></div>
-                    <div><label>填空题</label><input type="number" id="num-fill" value="5"></div>
-                    <div><label>判断题</label><input type="number" id="num-judge" value="5"></div>
-                    <div><label>简答/论述</label><input type="number" id="num-essay" value="2"></div>
+            
+            <div class="mode-card" onclick="selectMode('practice')">
+                <div class="mode-icon">💡</div>
+                <h2 class="mode-title">训练模式</h2>
+                <p class="mode-desc">逐题练习，即时反馈，稳步提升知识掌握</p>
+                <ul class="mode-features">
+                    <li>无时间限制</li>
+                    <li>即时查看答案</li>
+                    <li>年份标注</li>
+                    <li>详细解析</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- 考试配置 -->
+        <div id="examConfig" class="config-panel">
+            <h2 class="mode-title">考试配置</h2>
+            
+            <div class="form-group">
+                <label>选择题型和数量：</label>
+                <div class="question-type-grid">
+                    <div class="type-option">
+                        <input type="checkbox" id="type-noun" value="名词解释" checked>
+                        <label for="type-noun">名词解释</label>
+                        <input type="number" id="num-noun" min="0" max="20" value="5">
+                    </div>
+                    <div class="type-option">
+                        <input type="checkbox" id="type-fill" value="填空题" checked>
+                        <label for="type-fill">填空题</label>
+                        <input type="number" id="num-fill" min="0" max="20" value="5">
+                    </div>
+                    <div class="type-option">
+                        <input type="checkbox" id="type-short" value="简答题" checked>
+                        <label for="type-short">简答题</label>
+                        <input type="number" id="num-short" min="0" max="10" value="3">
+                    </div>
                 </div>
             </div>
-
-            <div id="exam-time-box" class="hidden">
-                <label>考试时长 (分钟)</label>
-                <input type="number" id="exam-time" value="180">
-            </div>
-
-            <label>AI API Key (阿里百炼)</label>
-            <input type="password" id="api-key" value="sk-b65219b6fe91460aae42bed7d5e166b4">
             
-            <button class="btn" style="width:100%; margin-top:15px; font-size:18px;" onclick="startQuiz()">🚀 开始答题</button>
+            <div class="form-group">
+                <label for="timeLimit">考试时长（分钟）：</label>
+                <input type="number" id="timeLimit" min="10" max="180" value="60">
+            </div>
+            
+            <div>
+                <button class="btn" onclick="startExam()">开始考试</button>
+                <button class="btn btn-secondary" onclick="backToModeSelection()">返回</button>
+            </div>
         </div>
-
-        <div id="quiz-panel" class="card hidden">
-            <div id="timer" class="timer hidden">03:00:00</div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                <span id="progress"></span>
-                <button class="btn btn-outline" style="padding:5px 10px; font-size:12px;" onclick="exitQuiz()">退出</button>
+        
+        <!-- 训练配置 -->
+        <div id="practiceConfig" class="config-panel">
+            <h2 class="mode-title">训练配置</h2>
+            
+            <div class="form-group">
+                <label for="practiceType">题型选择：</label>
+                <select id="practiceType">
+                    <option value="all">全部题型</option>
+                    <option value="名词解释">名词解释</option>
+                    <option value="填空题">填空题</option>
+                    <option value="简答题">简答题</option>
+                </select>
             </div>
             
-            <div id="question-display"></div>
-
-            <div style="display:flex; justify-content:space-between; margin-top:20px;">
-                <button class="btn btn-outline" onclick="nav(-1)" id="btn-prev">上一题</button>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn" onclick="checkAnswer()" id="btn-check" style="background:#27ae60;">✅ 提交本题 & 看解析</button>
-                    <button class="btn" onclick="nav(1)" id="btn-next">下一题</button>
+            <div class="form-group">
+                <label for="practiceYear">年份选择：</label>
+                <select id="practiceYear">
+                    <option value="all">全部年份</option>
+                </select>
+            </div>
+            
+            <div>
+                <button class="btn" onclick="startPractice()">开始训练</button>
+                <button class="btn btn-secondary" onclick="backToModeSelection()">返回</button>
+            </div>
+        </div>
+        
+        <!-- 答题界面 -->
+        <div id="quizContainer" class="quiz-container">
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+            </div>
+            
+            <div class="question-card">
+                <div class="question-header">
+                    <div class="question-info">
+                        <span id="questionNumber" class="info-badge">第 1 题</span>
+                        <span id="questionType" class="info-badge">名词解释</span>
+                        <span id="questionYear" class="info-badge" style="display: none;">年份</span>
+                    </div>
+                    <div id="timer" class="timer" style="display: none;">60:00</div>
+                </div>
+                
+                <div class="question-content">
+                    <div id="questionText" class="question-text"></div>
+                    
+                    <div class="answer-area">
+                        <textarea id="answerInput" placeholder="请输入您的答案..."></textarea>
+                    </div>
+                    
+                    <div id="answerFeedback" class="answer-feedback"></div>
+                </div>
+                
+                <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                    <button id="submitAnswerBtn" class="btn" onclick="submitAnswer()">提交答案</button>
+                    <button id="nextQuestionBtn" class="btn" style="display: none;" onclick="nextQuestion()">下一题</button>
+                    <button id="finishExamBtn" class="btn" style="display: none;" onclick="finishExam()">完成考试</button>
                 </div>
             </div>
-            <button class="btn" onclick="submitExam()" id="btn-submit-exam" style="width:100%; margin-top:20px; background:#c0392b; display:none;">🏁 交卷</button>
         </div>
-
-        <div id="result-panel" class="card hidden">
-            <h2>📊 成绩单</h2>
-            <div id="score-board"></div>
-            <button class="btn" onclick="location.reload()" style="width:100%">再来一次</button>
-        </div>
-
-        <div class="card" style="border-top: 4px solid #f1c40f;">
-            <h3>📥 题库更新工具</h3>
-            <p style="font-size:14px; color:#666;">如果想加入全部真题：请复制文档全文 -> 粘贴到下面 -> 点击解析 -> <b>解析成功后会自动加载到当前系统</b>。</p>
-            <textarea id="import-text" rows="3" placeholder="在此粘贴《生化真题.docx》的全部内容..."></textarea>
-            <button class="btn btn-outline" onclick="importQuestions()">解析并载入题库</button>
-            <p id="import-status" style="font-size:12px; margin-top:5px;"></p>
+        
+        <!-- 成绩展示 -->
+        <div id="resultsPanel" class="results-panel">
+            <h2 class="mode-title">考试成绩</h2>
+            
+            <div class="score-display">
+                <div class="score-number" id="finalScore">0</div>
+                <div class="score-label">综合得分</div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="correctCount">0</div>
+                    <div class="stat-label">答对题数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalCount">0</div>
+                    <div class="stat-label">总题数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="accuracy">0%</div>
+                    <div class="stat-label">正确率</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="timeUsed">0</div>
+                    <div class="stat-label">用时（分钟）</div>
+                </div>
+            </div>
+            
+            <h3 style="margin: 2rem 0 1rem; font-family: 'Noto Serif SC', serif;">答题回顾</h3>
+            <div id="reviewList" class="review-list"></div>
+            
+            <div style="margin-top: 2rem;">
+                <button class="btn" onclick="restartQuiz()">重新开始</button>
+            </div>
         </div>
     </div>
-
+    
     <script>
-        // ================= 数据区 (预设部分题目) =================
-        let questionBank = [
-            {id: 1, year: "1995", type: "名词解释", question: "肽单元", answer: "肽链中的酰胺基团称为肽单位，由四个原子（CHON）及相连的两个α-碳原子组成。"},
-            {id: 2, year: "1995", type: "判断题", question: "DNA复制时，前导链的合成是连续的，滞后链的合成是不连续的。", answer: "对。前导链沿着解链方向 5'->3' 连续合成，而滞后链则需要合成冈崎片段再连接。"},
-            {id: 3, year: "2024", type: "填空题", question: "人体内嘌呤核苷酸分解代谢的最终产物是___。", answer: "尿酸"},
-            {id: 4, year: "2024", type: "问答题", question: "简述蛋白质二级结构的类型及其特点。", answer: "主要包括α-螺旋、β-折叠、β-转角和无规卷曲。α-螺旋是右手螺旋，氢键维持稳定；β-折叠是多肽链平行或反平行排列..."}
-        ];
-
-        // ================= 逻辑区 =================
-        let currentMode = 'training';
-        let quizList = [];
-        let currIdx = 0;
-        let userAns = {}; // {id: "答案"}
-        let timerInterval;
-
-        // 模式切换
-        function setMode(mode) {
-            currentMode = mode;
-            document.getElementById('mode-train').className = mode === 'training' ? 'btn' : 'btn btn-outline';
-            document.getElementById('mode-exam').className = mode === 'exam' ? 'btn' : 'btn btn-outline';
-            document.getElementById('exam-time-box').className = mode === 'exam' ? '' : 'hidden';
+        // 题库数据将从question_bank.json加载
+        let questionBank = [];
+        let currentMode = '';
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let userAnswers = [];
+        let timer = null;
+        let timeRemaining = 0;
+        let startTime = null;
+        
+        // API配置
+        const API_KEY = 'sk-b65219b6fe91460aae42bed7d5e166b4';
+        const API_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
+        
+        // 加载题库
+        async function loadQuestionBank() {
+            try {
+                const response = await fetch('question_bank.json');
+                questionBank = await response.json();
+                
+                // 填充年份选择器
+                const years = [...new Set(questionBank.map(q => q.year))].sort();
+                const yearSelect = document.getElementById('practiceYear');
+                years.forEach(year => {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year + '年';
+                    yearSelect.appendChild(option);
+                });
+                
+                console.log('题库加载成功，共', questionBank.length, '道题');
+            } catch (error) {
+                console.error('题库加载失败:', error);
+                alert('题库加载失败，请刷新页面重试');
+            }
         }
-
-        // 开始答题
-        function startQuiz() {
-            // 1. 抽题
-            const types = {
-                noun: parseInt(document.getElementById('num-noun').value) || 0,
-                fill: parseInt(document.getElementById('num-fill').value) || 0,
-                judge: parseInt(document.getElementById('num-judge').value) || 0,
-                essay: parseInt(document.getElementById('num-essay').value) || 0
-            };
-
-            const pool = {
-                noun: questionBank.filter(q => q.type.includes('名词')),
-                fill: questionBank.filter(q => q.type.includes('填空')),
-                judge: questionBank.filter(q => q.type.includes('判断')),
-                essay: questionBank.filter(q => !q.type.includes('名词') && !q.type.includes('填空') && !q.type.includes('判断')) // 其他都算简答/论述
-            };
-
-            quizList = [
-                ...shuffle(pool.judge).slice(0, types.judge),
-                ...shuffle(pool.fill).slice(0, types.fill),
-                ...shuffle(pool.noun).slice(0, types.noun),
-                ...shuffle(pool.essay).slice(0, types.essay)
-            ];
-
-            if (quizList.length === 0) {
-                alert("题库为空或未找到对应题目，请先在下方导入题库！");
+        
+        // 选择模式
+        function selectMode(mode) {
+            currentMode = mode;
+            document.getElementById('modeSelection').style.display = 'none';
+            
+            if (mode === 'exam') {
+                document.getElementById('examConfig').classList.add('active');
+            } else {
+                document.getElementById('practiceConfig').classList.add('active');
+            }
+        }
+        
+        // 返回模式选择
+        function backToModeSelection() {
+            document.getElementById('examConfig').classList.remove('active');
+            document.getElementById('practiceConfig').classList.remove('active');
+            document.getElementById('modeSelection').style.display = 'grid';
+            currentMode = '';
+        }
+        
+        // 开始考试
+        function startExam() {
+            const selectedTypes = [];
+            const typeCounts = {};
+            
+            // 获取选中的题型和数量
+            if (document.getElementById('type-noun').checked) {
+                const count = parseInt(document.getElementById('num-noun').value) || 0;
+                if (count > 0) {
+                    selectedTypes.push('名词解释');
+                    typeCounts['名词解释'] = count;
+                }
+            }
+            if (document.getElementById('type-fill').checked) {
+                const count = parseInt(document.getElementById('num-fill').value) || 0;
+                if (count > 0) {
+                    selectedTypes.push('填空题');
+                    typeCounts['填空题'] = count;
+                }
+            }
+            if (document.getElementById('type-short').checked) {
+                const count = parseInt(document.getElementById('num-short').value) || 0;
+                if (count > 0) {
+                    selectedTypes.push('简答题');
+                    typeCounts['简答题'] = count;
+                }
+            }
+            
+            if (selectedTypes.length === 0) {
+                alert('请至少选择一种题型');
                 return;
             }
-
-            // 2. 初始化UI
-            currIdx = 0;
-            userAns = {};
-            document.getElementById('setup-panel').classList.add('hidden');
-            document.getElementById('quiz-panel').classList.remove('hidden');
-            renderQuestion();
-
-            // 3. 考试模式倒计时
-            if (currentMode === 'exam') {
-                document.getElementById('timer').classList.remove('hidden');
-                document.getElementById('btn-check').classList.add('hidden'); // 考试不能立马看答案
-                document.getElementById('btn-submit-exam').style.display = 'block'; // 显示交卷
-                startTimer(parseInt(document.getElementById('exam-time').value) * 60);
-            } else {
-                document.getElementById('timer').classList.add('hidden');
-                document.getElementById('btn-check').classList.remove('hidden');
-                document.getElementById('btn-submit-exam').style.display = 'none';
-            }
-        }
-
-        // 渲染题目
-        function renderQuestion() {
-            const q = quizList[currIdx];
-            const total = quizList.length;
-            document.getElementById('progress').innerText = `第 ${currIdx + 1} / ${total} 题`;
             
-            // 按钮状态
-            document.getElementById('btn-prev').disabled = currIdx === 0;
-            if (currentMode === 'training') {
-                 document.getElementById('btn-next').disabled = currIdx === total - 1;
-            } else {
-                 document.getElementById('btn-next').disabled = currIdx === total - 1;
-            }
-
-            // 输入框提示
-            let placeholder = "请输入答案...";
-            if (q.type.includes("判断")) placeholder = "请输入'对'或'错'，若为错请说明理由...";
-
-            const savedAns = userAns[q.id] || "";
-            const isChecked = q.checked === true; // 训练模式下是否已提交
-
-            let html = `
-                <div class="question-box">
-                    <div>
-                        <span class="meta">${q.type}</span>
-                        ${(currentMode==='training' && isChecked) || currentMode==='exam' ? '' : '<span class="meta">年份隐藏</span>'}
-                        ${(currentMode==='training' && isChecked) ? `<span class="meta" style="color:#e67e22">${q.year}年</span>` : ''}
-                    </div>
-                    <h3 style="text-align:left; margin:10px 0;">${q.question}</h3>
-                    <textarea id="ans-input" rows="5" placeholder="${placeholder}" oninput="userAns[${q.id}] = this.value">${savedAns}</textarea>
-                </div>
-            `;
-
-            // 训练模式：显示解析区
-            if (currentMode === 'training') {
-                html += `
-                    <div id="feedback-area" class="${isChecked ? '' : 'hidden'} ai-feedback">
-                        <h4>📖 参考答案：</h4>
-                        <p>${q.answer}</p>
-                        <div id="ai-box-${q.id}">
-                            <button class="btn btn-outline" onclick="callAI(${q.id})" style="font-size:12px;">🤖 召唤 AI 老师严格判卷</button>
-                        </div>
-                    </div>
-                `;
-            }
-
-            document.getElementById('question-display').innerHTML = html;
-        }
-
-        // 导航
-        function nav(dir) {
-            currIdx += dir;
-            renderQuestion();
-        }
-
-        // 训练模式：提交单题
-        function checkAnswer() {
-            const q = quizList[currIdx];
-            q.checked = true; // 标记为已看答案
-            renderQuestion(); // 重新渲染以显示答案
-        }
-
-        // 考试模式：交卷
-        function submitExam() {
-            if(!confirm("确认交卷？")) return;
-            clearInterval(timerInterval);
-            
-            // 渲染结果页
-            document.getElementById('quiz-panel').classList.add('hidden');
-            document.getElementById('result-panel').classList.remove('hidden');
-            
-            let html = '';
-            quizList.forEach((q, i) => {
-                html += `
-                    <div class="card" style="border-left:5px solid #bdc3c7;">
-                        <span class="meta">${q.year}</span> <span class="meta">${q.type}</span>
-                        <p><b>Q${i+1}: ${q.question}</b></p>
-                        <div style="background:#f1f1f1; padding:10px; margin:5px 0;">你的回答：${userAns[q.id] || "未作答"}</div>
-                        <div style="background:#eafaf1; padding:10px; margin:5px 0;">参考答案：${q.answer}</div>
-                        <div id="result-ai-${q.id}" style="margin-top:10px;">
-                            <button class="btn btn-outline" onclick="callAI(${q.id}, 'result-ai-${q.id}')">🤖 AI 判分</button>
-                        </div>
-                    </div>
-                `;
+            // 按题型随机抽题
+            currentQuestions = [];
+            selectedTypes.forEach(type => {
+                const typeQuestions = questionBank.filter(q => q.type === type);
+                const shuffled = typeQuestions.sort(() => 0.5 - Math.random());
+                const selected = shuffled.slice(0, typeCounts[type]);
+                currentQuestions.push(...selected);
             });
-            document.getElementById('score-board').innerHTML = html;
-        }
-
-        // ================= AI 判卷核心 (Prompt 在这里!) =================
-        async function callAI(qid, divId) {
-            const q = questionBank.find(item => item.id === qid);
-            const ans = userAns[qid] || "未作答";
-            const target = document.getElementById(divId || `ai-box-${qid}`);
-            const apiKey = document.getElementById('api-key').value;
-
-            target.innerHTML = '<span class="loading">🧠 AI 正在像考研阅卷组长一样审视你的答案...</span>';
-
-            // 🔴 重点：这里就是你问的提示词 (Prompt) 设置 🔴
-            // 你可以修改 content 里的文字来改变 AI 的性格
-            const systemPrompt = "你是一位极度严格的生物化学考研阅卷专家。你的任务是根据题目类型、标准答案，对考生的回答进行打分（0-10分）。";
             
-            let typeInstruction = "";
-            if (q.type.includes("判断")) {
-                typeInstruction = "这是一道判断题。如果考生的判断（对/错）错误，直接给0分。如果判断正确但理由缺失或错误，给3-5分。只有判断和理由都准确才给高分。";
+            if (currentQuestions.length === 0) {
+                alert('没有找到符合条件的题目');
+                return;
+            }
+            
+            // 设置时间
+            const timeLimit = parseInt(document.getElementById('timeLimit').value) || 60;
+            timeRemaining = timeLimit * 60; // 转换为秒
+            
+            // 初始化
+            currentIndex = 0;
+            userAnswers = new Array(currentQuestions.length).fill(null).map(() => ({
+                answer: '',
+                score: 0,
+                feedback: ''
+            }));
+            startTime = Date.now();
+            
+            // 显示答题界面
+            document.getElementById('examConfig').classList.remove('active');
+            document.getElementById('quizContainer').classList.add('active');
+            document.getElementById('timer').style.display = 'block';
+            document.getElementById('questionYear').style.display = 'none';
+            
+            // 开始计时
+            startTimer();
+            
+            // 显示第一题
+            showQuestion();
+        }
+        
+        // 开始训练
+        function startPractice() {
+            const selectedType = document.getElementById('practiceType').value;
+            const selectedYear = document.getElementById('practiceYear').value;
+            
+            // 筛选题目
+            let filtered = questionBank;
+            if (selectedType !== 'all') {
+                filtered = filtered.filter(q => q.type === selectedType);
+            }
+            if (selectedYear !== 'all') {
+                filtered = filtered.filter(q => q.year === selectedYear);
+            }
+            
+            if (filtered.length === 0) {
+                alert('没有找到符合条件的题目');
+                return;
+            }
+            
+            // 随机打乱
+            currentQuestions = filtered.sort(() => 0.5 - Math.random());
+            
+            // 初始化
+            currentIndex = 0;
+            userAnswers = new Array(currentQuestions.length).fill(null).map(() => ({
+                answer: '',
+                score: 0,
+                feedback: ''
+            }));
+            
+            // 显示答题界面
+            document.getElementById('practiceConfig').classList.remove('active');
+            document.getElementById('quizContainer').classList.add('active');
+            document.getElementById('questionYear').style.display = 'inline-block';
+            
+            // 显示第一题
+            showQuestion();
+        }
+        
+        // 显示题目
+        function showQuestion() {
+            const question = currentQuestions[currentIndex];
+            
+            document.getElementById('questionNumber').textContent = `第 ${currentIndex + 1} / ${currentQuestions.length} 题`;
+            document.getElementById('questionType').textContent = question.type;
+            document.getElementById('questionText').textContent = question.question;
+            
+            if (currentMode === 'practice') {
+                document.getElementById('questionYear').textContent = question.year + '年';
+            }
+            
+            // 恢复之前的答案
+            document.getElementById('answerInput').value = userAnswers[currentIndex].answer || '';
+            
+            // 清除反馈
+            const feedback = document.getElementById('answerFeedback');
+            feedback.classList.remove('show', 'correct', 'partial', 'incorrect');
+            feedback.innerHTML = '';
+            
+            // 更新按钮显示
+            if (currentMode === 'practice') {
+                document.getElementById('submitAnswerBtn').style.display = 'inline-block';
+                document.getElementById('nextQuestionBtn').style.display = 'none';
+                document.getElementById('finishExamBtn').style.display = 'none';
             } else {
-                typeInstruction = "对于填空题，必须精准。对于名词解释和简答题，要检查关键点（Keywords），漏一个关键点扣相应分数，不要给同情分。";
+                document.getElementById('submitAnswerBtn').style.display = 'inline-block';
+                document.getElementById('nextQuestionBtn').style.display = 'none';
+                document.getElementById('finishExamBtn').style.display = 'none';
             }
-
-            const userPrompt = `
-【题目】(${q.type})：${q.question}
-【标准答案】：${q.answer}
-【考生回答】：${ans}
-
-请给出：
-1. **得分**：X / 10
-2. **点评**：指出错误之处，并给出更专业的表述建议。
-`;
-
-            try {
-                const res = await fetch("https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
-                    body: JSON.stringify({
-                        model: "qwen-plus",
-                        messages: [
-                            { role: "system", content: systemPrompt + typeInstruction },
-                            { role: "user", content: userPrompt }
-                        ]
-                    })
-                });
-                const data = await res.json();
-                if (data.choices) {
-                    target.innerHTML = marked.parse(data.choices[0].message.content);
-                } else {
-                    target.innerHTML = `<span style="color:red">AI 报错: ${data.message}</span>`;
+            
+            // 更新进度条
+            const progress = ((currentIndex + 1) / currentQuestions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+        
+        // 计时器
+        function startTimer() {
+            timer = setInterval(() => {
+                timeRemaining--;
+                
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                const timerDisplay = document.getElementById('timer');
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // 最后5分钟警告
+                if (timeRemaining <= 300 && timeRemaining > 0) {
+                    timerDisplay.classList.add('warning');
                 }
-            } catch (e) {
-                target.innerHTML = `<span style="color:red">网络错误，请检查 API Key。</span>`;
-            }
-        }
-
-        // ================= 工具函数 =================
-        function shuffle(array) {
-            return array.sort(() => Math.random() - 0.5);
-        }
-
-        function startTimer(seconds) {
-            let t = seconds;
-            const display = document.getElementById('timer');
-            timerInterval = setInterval(() => {
-                const m = Math.floor(t / 60).toString().padStart(2, '0');
-                const s = (t % 60).toString().padStart(2, '0');
-                display.innerText = `${m}:${s}`;
-                if (t-- <= 0) {
-                    clearInterval(timerInterval);
-                    alert("考试结束，强制交卷！");
-                    submitExam();
+                
+                // 时间到
+                if (timeRemaining <= 0) {
+                    clearInterval(timer);
+                    alert('考试时间已到，系统将自动提交');
+                    finishExam();
                 }
             }, 1000);
         }
-
-        function exitQuiz() {
-            if(confirm("确定退出当前答题？进度将丢失。")) location.reload();
-        }
-
-        // ================= 题库解析器 =================
-        function importQuestions() {
-            const text = document.getElementById('import-text').value;
-            if (!text.trim()) { alert("请先粘贴内容！"); return; }
+        
+        // 提交答案
+        async function submitAnswer() {
+            const answer = document.getElementById('answerInput').value.trim();
             
+            if (!answer) {
+                alert('请输入答案');
+                return;
+            }
+            
+            // 保存答案
+            userAnswers[currentIndex].answer = answer;
+            
+            // 显示加载状态
+            const submitBtn = document.getElementById('submitAnswerBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.innerHTML = '<span class="loading"></span> AI判卷中...';
+            submitBtn.disabled = true;
+            
+            // AI评分
             try {
-                const lines = text.split('\n');
-                let newBank = [];
-                let curr = null;
-                let year = "未知";
-                let type = "未知";
-
-                // 简单的状态机解析
-                lines.forEach(line => {
-                    line = line.trim();
-                    if(!line) return;
-                    
-                    // 匹配年份 "1995年..."
-                    if (line.match(/\d{4}年/)) {
-                        year = line.match(/(\d{4})/)[1];
-                        return;
-                    }
-                    // 匹配大题类型 "一、名词解释"
-                    if (line.match(/^[一二三四五]、/)) {
-                        type = line.replace(/^[一二三四五]、/, '').trim();
-                        return;
-                    }
-                    // 匹配具体题目 "1. 题目..."
-                    const qMatch = line.match(/^(\d+)\.(.*)/);
-                    if (qMatch) {
-                        if (curr) newBank.push(curr);
-                        curr = {
-                            id: newBank.length + Date.now(), // 唯一ID
-                            year: year,
-                            type: type,
-                            question: qMatch[2].trim(),
-                            answer: ""
-                        };
-                    } else if (curr) {
-                        // 剩下的行都算作上一题的答案
-                        curr.answer += line + "\n";
-                    }
-                });
-                if (curr) newBank.push(curr);
-
-                // 更新全局题库
-                questionBank = newBank;
-                document.getElementById('import-status').innerText = `✅ 成功导入 ${newBank.length} 道题目！现在点击上方“开始答题”即可使用新题库。`;
-                document.getElementById('import-status').style.color = "green";
-                alert(`成功识别 ${newBank.length} 道题！\n年份示例：${newBank[0].year}\n类型示例：${newBank[0].type}`);
-                
-            } catch (e) {
-                alert("解析出错，请检查文本格式。");
-                console.error(e);
+                await gradeAnswer(currentIndex);
+            } catch (error) {
+                console.error('AI评分失败:', error);
+                // 使用简单匹配作为备选
+                simpleGrade(currentIndex);
+            }
+            
+            // 恢复按钮
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+            
+            // 显示反馈
+            showFeedback();
+            
+            // 更新按钮
+            document.getElementById('submitAnswerBtn').style.display = 'none';
+            
+            if (currentMode === 'practice') {
+                if (currentIndex < currentQuestions.length - 1) {
+                    document.getElementById('nextQuestionBtn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('finishExamBtn').style.display = 'inline-block';
+                }
+            } else {
+                if (currentIndex < currentQuestions.length - 1) {
+                    document.getElementById('nextQuestionBtn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('finishExamBtn').style.display = 'inline-block';
+                }
             }
         }
+        
+        // AI评分
+        async function gradeAnswer(index) {
+            const question = currentQuestions[index];
+            const userAnswer = userAnswers[index].answer;
+            
+            const prompt = `你是一位严格的考研生物化学阅卷老师。请按照考研标准评判以下答案。
+
+题目类型：${question.type}
+题目：${question.question}
+
+标准答案：
+${question.answer}
+
+学生答案：
+${userAnswer}
+
+请按以下格式返回JSON评分结果：
+{
+    "score": 分数(0-10),
+    "feedback": "评语（指出答对了哪些要点，漏掉了哪些关键内容，以及表述是否准确）"
+}
+
+评分标准：
+- 名词解释（10分）：完整准确定义6-8分，基本正确但不够完整4-5分，概念模糊或错误0-3分
+- 填空题（10分）：完全正确10分，部分正确5分，错误0分
+- 简答题（10分）：要点齐全、表述准确8-10分，要点基本齐全但表述欠缺5-7分，要点不全或有明显错误0-4分
+
+请严格按照考研标准评判，不要过于宽容。`;
+
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: 'qwen-plus',
+                    messages: [
+                        {
+                            role: 'user',
+                            content: prompt
+                        }
+                    ],
+                    temperature: 0.3
+                })
+            });
+            
+            const data = await response.json();
+            const aiResponse = data.choices[0].message.content;
+            
+            // 解析JSON结果
+            try {
+                const match = aiResponse.match(/\{[\s\S]*\}/);
+                if (match) {
+                    const result = JSON.parse(match[0]);
+                    userAnswers[index].score = result.score;
+                    userAnswers[index].feedback = result.feedback;
+                } else {
+                    // 如果无法解析，使用简单匹配
+                    simpleGrade(index);
+                }
+            } catch (e) {
+                simpleGrade(index);
+            }
+        }
+        
+        // 简单评分（备选方案）
+        function simpleGrade(index) {
+            const question = currentQuestions[index];
+            const userAnswer = userAnswers[index].answer.toLowerCase();
+            const standardAnswer = question.answer.toLowerCase();
+            
+            // 提取关键词
+            const keywords = standardAnswer.match(/[\u4e00-\u9fa5]{2,}/g) || [];
+            let matchCount = 0;
+            
+            keywords.forEach(keyword => {
+                if (userAnswer.includes(keyword)) {
+                    matchCount++;
+                }
+            });
+            
+            const ratio = keywords.length > 0 ? matchCount / keywords.length : 0;
+            
+            if (ratio >= 0.8) {
+                userAnswers[index].score = 9;
+                userAnswers[index].feedback = '答案基本正确，涵盖了大部分关键要点。';
+            } else if (ratio >= 0.6) {
+                userAnswers[index].score = 7;
+                userAnswers[index].feedback = '答案部分正确，但遗漏了一些关键要点。';
+            } else if (ratio >= 0.4) {
+                userAnswers[index].score = 5;
+                userAnswers[index].feedback = '答案涵盖了部分要点，但不够完整。';
+            } else {
+                userAnswers[index].score = 3;
+                userAnswers[index].feedback = '答案与标准答案差异较大，建议重新学习相关知识点。';
+            }
+        }
+        
+        // 显示反馈
+        function showFeedback() {
+            const question = currentQuestions[currentIndex];
+            const result = userAnswers[currentIndex];
+            const feedback = document.getElementById('answerFeedback');
+            
+            let className = 'incorrect';
+            let title = '需要改进';
+            
+            if (result.score >= 8) {
+                className = 'correct';
+                title = '优秀';
+            } else if (result.score >= 6) {
+                className = 'partial';
+                title = '良好';
+            }
+            
+            let html = `
+                <div class="feedback-title">${title}（${result.score}/10分）</div>
+                <div class="ai-analysis">
+                    <div class="ai-title">AI评语</div>
+                    <div>${result.feedback}</div>
+                </div>
+            `;
+            
+            if (currentMode === 'practice') {
+                html += `
+                    <div class="reference-answer">
+                        <div class="reference-title">参考答案（${question.year}年）</div>
+                        <div>${question.answer}</div>
+                    </div>
+                `;
+            }
+            
+            feedback.innerHTML = html;
+            feedback.classList.add('show', className);
+        }
+        
+        // 下一题
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex < currentQuestions.length) {
+                showQuestion();
+            } else {
+                finishExam();
+            }
+        }
+        
+        // 完成考试
+        function finishExam() {
+            if (timer) {
+                clearInterval(timer);
+            }
+            
+            // 计算成绩
+            const totalScore = userAnswers.reduce((sum, a) => sum + a.score, 0);
+            const maxScore = currentQuestions.length * 10;
+            const finalScore = Math.round((totalScore / maxScore) * 100);
+            const correctCount = userAnswers.filter(a => a.score >= 8).length;
+            const accuracy = Math.round((correctCount / currentQuestions.length) * 100);
+            
+            // 计算用时
+            const timeUsed = startTime ? Math.round((Date.now() - startTime) / 60000) : 0;
+            
+            // 显示成绩
+            document.getElementById('quizContainer').classList.remove('active');
+            document.getElementById('resultsPanel').classList.add('active');
+            
+            document.getElementById('finalScore').textContent = finalScore;
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('totalCount').textContent = currentQuestions.length;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+            document.getElementById('timeUsed').textContent = timeUsed;
+            
+            // 生成回顾列表
+            const reviewList = document.getElementById('reviewList');
+            reviewList.innerHTML = '';
+            
+            currentQuestions.forEach((question, index) => {
+                const result = userAnswers[index];
+                let scoreClass = 'incorrect';
+                let scoreText = '需改进';
+                
+                if (result.score >= 8) {
+                    scoreClass = 'correct';
+                    scoreText = '优秀';
+                } else if (result.score >= 6) {
+                    scoreClass = 'partial';
+                    scoreText = '良好';
+                }
+                
+                const item = document.createElement('div');
+                item.className = 'review-item';
+                item.innerHTML = `
+                    <div class="review-item-header">
+                        <div class="review-question">
+                            <strong>${index + 1}. [${question.type}]</strong> ${question.question.substring(0, 50)}...
+                        </div>
+                        <div class="review-score ${scoreClass}">${scoreText} (${result.score}/10)</div>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                        ${result.feedback}
+                    </div>
+                `;
+                reviewList.appendChild(item);
+            });
+        }
+        
+        // 重新开始
+        function restartQuiz() {
+            document.getElementById('resultsPanel').classList.remove('active');
+            document.getElementById('modeSelection').style.display = 'grid';
+            currentMode = '';
+            currentQuestions = [];
+            currentIndex = 0;
+            userAnswers = [];
+        }
+        
+        // 页面加载时初始化
+        window.addEventListener('load', loadQuestionBank);
     </script>
 </body>
 </html>
